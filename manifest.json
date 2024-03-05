@@ -1,27 +1,23 @@
 {
-	"manifest_version": 2,
-	"name": "Browser-Buddy",
-	"description": "Summarizer for webpages",
-	"version": "0.0.1",
-	"icons": {
-		"64": "icons/icon.png"
-	},
-	"background": {
-		"scripts": [
-			"background_script.js"
-		]
-	},
-	"content_scripts": [
-		{
-			"matches": [
-				"*://*.mozilla.org/*"
-			],
-			"js": [
-				"content_script.js"
-			]
-		}
-	],
-	"options_ui": {
-		"page": "options/index.html"
-	}
+ "manifest_version": 3,
+ "name": "My Extension",
+ "description": "An extension that uses OpenAI API",
+ "version": "1.0",
+ "permissions": ["activeTab"],
+ "background": {
+    "scripts": ["src/background.js"]
+ },
+ "action": {
+    "default_icon": "assets/icons/beast-32.png",
+    "default_popup": "src/popup/dropdown.html"
+ },
+
+ "host_permissions": ["https://api.openai.com/*"],
+
+ "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"]
+    }
+ ]
 }
