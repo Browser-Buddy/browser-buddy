@@ -3,7 +3,7 @@
  "name": "My Extension",
  "description": "An extension that uses OpenAI API",
  "version": "1.0",
- "permissions": ["activeTab"],
+ "permissions": ["activeTab", "menus"],
  "background": {
     "scripts": ["src/background.js"]
  },
