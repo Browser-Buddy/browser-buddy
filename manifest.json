@@ -1,0 +1,32 @@
+{
+ "manifest_version": 3,
+ "name": "Browser Buddy",
+ "version": "0.1.0",
+ "description": "Summarize highlighted text using OpenAI API.",
+ "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus"
+ ],
+ "action": {
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+ },
+ "background": {
+    "scripts": ["src/background.js"]
+ },
+ "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+		"css": ["src/style.css"],
+      "js": ["src/content.js"]
+    }
+ ],
+ "options_ui": {
+		"page": "options/options.html"
+	}
+}
+
