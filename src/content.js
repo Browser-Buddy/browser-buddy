@@ -1,6 +1,5 @@
 const API_URL = "https://api.openai.com/v1/chat/completions";
 
-
 browser.runtime.onMessage.addListener((request) => {
 	switch (request.action) {
 		case 'summarize':
@@ -18,73 +17,79 @@ browser.runtime.onMessage.addListener((request) => {
 	}
 });
 
-
 function displaySummaryContainer(text) {
-	let summaryContainer = document.getElementById('summary-container');
-
-	if (summaryContainer) {
-		summaryContainer.remove();
-	}
-
-	const newSummaryContainer = buildSummaryContainer();
-	document.body.appendChild(newSummaryContainer);
-	browser.runtime.sendMessage({
-		action: "API",
-		text: text
-	});
+  removeSummaryContainer();
+  const newSummaryContainer = buildSummaryContainer();
+  document.body.appendChild(newSummaryContainer);
+  sendMessageToExtension(text);
 }
 
+function removeSummaryContainer() {
+  const summaryContainer = document.getElementById('summary-container');
+  if (summaryContainer) {
+    summaryContainer.remove();
+  }
+}
+
+function sendMessageToExtension(text) {
+  browser.runtime.sendMessage({
+    action: "API",
+    text: text
+  });
+}
 
 function buildSummaryContainer() {
-	const summaryContainer = document.createElement('div');
-	summaryContainer.id = 'summary-container';
+	const summaryContainer = createElement('div', 'summary-container');
+	const header = createHeader();
+	const resultContainer = createResultContainer();
+	const footer = createFooter(resultContainer);
 
-	const header = document.createElement('header');
-	header.id = 'header';
+	summaryContainer.append(header, resultContainer, footer);
+  	return summaryContainer;
+}
 
-	const heading = document.createElement('h2');
-	heading.textContent = 'Browser Buddy';
+function createElement(tagName, id) {
+  	const element = document.createElement(tagName);
+  	if (id) element.id = id;
+  	return element;
+}
 
-	const exitBtn = document.createElement('button');
-	exitBtn.id = 'exit-btn';
-	exitBtn.textContent = 'X';
+function createHeader() {
+  	const header = createElement('header', 'header');
+  	
+	const heading = createElement('h2');
+  	heading.textContent = 'Browser Buddy';
+  	
+	const exitBtn = createElement('button', 'exit-btn');
+  	exitBtn.textContent = 'X';
 
-	header.appendChild(heading);
-	header.appendChild(exitBtn);
+  	header.append(heading, exitBtn);
+  	return header;
+}
 
-	const resultContainer = document.createElement('div');
-	resultContainer.id = 'result-container'
+function createResultContainer() {
+  	const resultContainer = createElement('div', 'result-container');
+  	const result = createElement('div', 'result-text');
+  	result.textContent = '';
 
-	const result = document.createElement('div');
-	result.id = 'result-text';
-	result.textContent = "";
-	
-	resultContainer.appendChild(result);
+  	resultContainer.appendChild(result);
+  	return resultContainer;
+}
 
-	const footer = document.createElement('footer');
-	footer.id = 'footer';
-	
-	const retryBtn = document.createElement('button');
-	retryBtn.id = 'retry-btn';
-	retryBtn.textContent = 'Retry';
+function createFooter(resultContainer) {
+  	const footer = createElement('footer', 'footer');
+  	const retryBtn = createElement('button', 'retry-btn');
+  	retryBtn.textContent = 'Retry';
+  	const copyBtn = createElement('button', 'copy-btn');
+  	copyBtn.textContent = 'Copy';
 
-	const copyBtn = document.createElement('button');
-	copyBtn.id = 'copy-btn';
-	copyBtn.textContent = 'Copy';
-	copyBtn.addEventListener('click', function() {
-		console.log("wtf");
-		navigator.clipboard.writeText(result.textContent).then(function () {
-			console.log('async: copied!');
-		});
-		
-	});
+  	copyBtn.addEventListener('click', () => {
+    	const resultText = resultContainer.querySelector('#result-text').textContent;
+    	navigator.clipboard.writeText(resultText)
+    		.then(() => console.log('Copied!'))
+    		.catch((err) => console.error('Failed to copy:', err));
+  	});
 
-	footer.appendChild(retryBtn);
-	footer.appendChild(copyBtn);
-
-	summaryContainer.appendChild(header);
-	summaryContainer.appendChild(resultContainer);
-	summaryContainer.appendChild(footer);
-
-	return summaryContainer;
+  	footer.append(retryBtn, copyBtn);
+  	return footer;
 }
