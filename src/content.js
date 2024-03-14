@@ -1,114 +1,81 @@
-const API_KEY = "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"
-const API_URL = "https://api.openai.com/v1/chat/completions"
+const API_URL = "https://api.openai.com/v1/chat/completions";
 
 browser.runtime.onMessage.addListener((request) => {
-    if (request.action === "generate") {
-        var prompt = request.prompt;
-        var resultText = request.resultText;
-
-        generate(prompt, resultText);
-
-    }
+	if (request.action === "summarize") {
+		displaySummaryContainer(request.selectedText);
+	}
 });
 
-const generate = async (prompt, resultText) => {
-    console.log(prompt);
-    console.log(resultText);
-    // Don't waste network bandwidth.
-    if (!prompt) {
-        alert("Enter a prompt!");
-        return;
-    }
+browser.runtime.onMessage.addListener((request) => {
+	if (request.action === "setResultText") {
+		document.getElementById("result-text").innerText = request.resultText;
+	}	
+});
 
-    // UI stuff, also avoid someone spamming generate until a
-    // response is completed.
-    // generateBtn.disabled = true;
+browser.runtime.onMessage.addListener((request) => {
+	if (request.action === "updateResultText") {
+		document.getElementById("result-text").innerText += request.resultText;
+	}	
+});
 
-    // stopBtn.disabled = false;
+function displaySummaryContainer(text) {
+	let summaryContainer = document.getElementById('summary-container');
 
-    controller = new AbortController();
-    const signal = controller.signal;
+	if (summaryContainer) {
+		summaryContainer.remove();
+	}
 
-    // Perform the fetch
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${API_KEY}`
-            },
+	const newSummaryContainer = buildSummaryContainer();
+	document.body.appendChild(newSummaryContainer);
+	browser.runtime.sendMessage({
+		action: "API",
+		text: text
+	});
+}
 
-            // The actual prompt being sent to OpenAI.
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [{
-                    role: "user",
-                    content: prompt
-                }],
-                stream: true
-            }),
-            signal,
-        });
+function buildSummaryContainer() {
+	const summaryContainer = document.createElement('div');
+	summaryContainer.id = 'summary-container';
 
-        // Live-inputs the incoming tokens
-        const reader = response.body.getReader();
+	const header = document.createElement('header');
+	header.id = 'header';
 
-        // Decoder required because the info is sent as bytes.
-        const decoder = new TextDecoder("utf-8");
+	const heading = document.createElement('h2');
+	heading.textContent = 'Browser Buddy';
 
-        resultText = "";
-        browser.runtime.sendMessage({
-            action: "setResultText",
-            resultText: resultText
-        });
+	const exitBtn = document.createElement('button');
+	exitBtn.id = 'exit-btn';
+	exitBtn.textContent = 'X';
 
-        while (true) {
-            const chunk = await reader.read();
-            const {done, value} = chunk;
-            if (done) {
-                break;
-            }
-            const decodedChunk = decoder.decode(value);
+	header.appendChild(heading);
+	header.appendChild(exitBtn);
 
-            // Removing the irrelevant information
-            const lines = decodedChunk.split("\n");
-            const parsedLines = lines
-                .map(line => line.replace(/^data: /, "").trim())
-                .filter(line => line !== "" && line !== "[DONE]")
-                .map(line => JSON.parse(line));
+	const resultContainer = document.createElement('div');
+	resultContainer.id = 'result-container'
 
-            for (const line of parsedLines) {
+	const result = document.createElement('div');
+	result.id = 'result-text';
+	result.textContent = "";
 
-                // Dereferencing hell
-                const {choices} = line;
-                const {delta} = choices[0];
-                const {content} = delta;
-                if (content) {
-                    console.log(content);
-                    browser.runtime.sendMessage({
-                        action: "updateResultText",
-                        resultText: content
-                    });
-                }
-            }
-        }
+	resultContainer.appendChild(result);
 
-    } catch (e) {
-        if (signal.aborted) {
-            browser.runtime.sendMessage({
-                action: "setResultText",
-                resultText: "Aborted!"
-            });
-        } else {
-            browser.runtime.sendMessage({
-                action: "setResultText",
-                resultText: "Error!"
-            });
-            console.error("Error: ", e)
-        }
-    } finally {
-        // stopBtn.disabled = true;
-        // generateBtn.disabled = false;
-        controller = null;
-    }
+	const footer = document.createElement('footer');
+	footer.id = 'footer';
+
+	const retryBtn = document.createElement('button');
+	retryBtn.id = 'retry-btn';
+	retryBtn.textContent = 'Retry';
+
+	const copyBtn = document.createElement('button');
+	copyBtn.id = 'copy-btn';
+	copyBtn.textContent = 'Copy';
+
+	footer.appendChild(retryBtn);
+	footer.appendChild(copyBtn);
+
+	summaryContainer.appendChild(header);
+	summaryContainer.appendChild(resultContainer);
+	summaryContainer.appendChild(footer);
+
+	return summaryContainer;
 }

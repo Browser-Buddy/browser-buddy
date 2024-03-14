@@ -1,23 +1,31 @@
 {
  "manifest_version": 3,
- "name": "My Extension",
- "description": "An extension that uses OpenAI API",
- "version": "1.0",
- "permissions": ["activeTab", "menus"],
+ "name": "Browser Buddy",
+ "version": "0.1.0",
+ "description": "Summarize highlighted text using OpenAI API.",
+ "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus"
+ ],
+ "action": {
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+ },
  "background": {
     "scripts": ["src/background.js"]
  },
- "action": {
-    "default_icon": "assets/icons/beast-32.png",
-    "default_popup": "src/popup/dropdown.html"
- },
-
- "host_permissions": ["https://api.openai.com/*"],
-
  "content_scripts": [
     {
       "matches": ["<all_urls>"],
+		"css": ["src/style.css"],
       "js": ["src/content.js"]
     }
- ]
+ ],
+ "options_ui": {
+		"page": "options/options.html"
+	}
 }
