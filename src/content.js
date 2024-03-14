@@ -6,10 +6,10 @@ browser.runtime.onMessage.addListener((request) => {
 			displaySummaryContainer(request.selectedText);
 			break;
 		case 'setResultText':
-			document.getElementById("result-text").innerText = request.resultText;
+			document.getElementById("bb-result-text").innerText = request.resultText;
 			break;
 		case 'updateResultText':
-			document.getElementById("result-text").innerText += request.resultText;
+			document.getElementById("bb-result-text").innerText += request.resultText;
 			break;
 
 		default:
@@ -25,7 +25,7 @@ function displaySummaryContainer(text) {
 }
 
 function removeSummaryContainer() {
-  const summaryContainer = document.getElementById('summary-container');
+  const summaryContainer = document.getElementById('bb-summary-container');
   if (summaryContainer) {
     summaryContainer.remove();
   }
@@ -39,7 +39,7 @@ function sendMessageToExtension(text) {
 }
 
 function buildSummaryContainer() {
-	const summaryContainer = createElement('div', 'summary-container');
+	const summaryContainer = createElement('div', 'bb-summary-container');
 	const header = createHeader();
 	const resultContainer = createResultContainer();
 	const footer = createFooter(resultContainer);
@@ -55,12 +55,12 @@ function createElement(tagName, id) {
 }
 
 function createHeader() {
-  	const header = createElement('header', 'header');
+  	const header = createElement('header', 'bb-header');
   	
 	const heading = createElement('h2');
   	heading.textContent = 'Browser Buddy';
   	
-	const exitBtn = createElement('button', 'exit-btn');
+	const exitBtn = createElement('button', 'bb-exit-btn');
   	exitBtn.textContent = 'X';
 
   	header.append(heading, exitBtn);
@@ -68,8 +68,8 @@ function createHeader() {
 }
 
 function createResultContainer() {
-  	const resultContainer = createElement('div', 'result-container');
-  	const result = createElement('div', 'result-text');
+  	const resultContainer = createElement('div', 'bb-result-container');
+  	const result = createElement('div', 'bb-result-text');
   	result.textContent = '';
 
   	resultContainer.appendChild(result);
@@ -77,14 +77,14 @@ function createResultContainer() {
 }
 
 function createFooter(resultContainer) {
-  	const footer = createElement('footer', 'footer');
-  	const retryBtn = createElement('button', 'retry-btn');
+  	const footer = createElement('footer', 'bb-footer');
+  	const retryBtn = createElement('button', 'bb-retry-btn');
   	retryBtn.textContent = 'Retry';
-  	const copyBtn = createElement('button', 'copy-btn');
+  	const copyBtn = createElement('button', 'bb-copy-btn');
   	copyBtn.textContent = 'Copy';
 
   	copyBtn.addEventListener('click', () => {
-    	const resultText = resultContainer.querySelector('#result-text').textContent;
+    	const resultText = resultContainer.querySelector('#bb-result-text').textContent;
     	navigator.clipboard.writeText(resultText)
     		.then(() => console.log('Copied!'))
     		.catch((err) => console.error('Failed to copy:', err));
