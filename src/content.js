@@ -1,22 +1,23 @@
 const API_URL = "https://api.openai.com/v1/chat/completions";
 
+
 browser.runtime.onMessage.addListener((request) => {
-	if (request.action === "summarize") {
-		displaySummaryContainer(request.selectedText);
+	switch (request.action) {
+		case 'summarize':
+			displaySummaryContainer(request.selectedText);
+			break;
+		case 'setResultText':
+			document.getElementById("result-text").innerText = request.resultText;
+			break;
+		case 'updateResultText':
+			document.getElementById("result-text").innerText += request.resultText;
+			break;
+
+		default:
+			break;
 	}
 });
 
-browser.runtime.onMessage.addListener((request) => {
-	if (request.action === "setResultText") {
-		document.getElementById("result-text").innerText = request.resultText;
-	}	
-});
-
-browser.runtime.onMessage.addListener((request) => {
-	if (request.action === "updateResultText") {
-		document.getElementById("result-text").innerText += request.resultText;
-	}	
-});
 
 function displaySummaryContainer(text) {
 	let summaryContainer = document.getElementById('summary-container');
@@ -32,6 +33,7 @@ function displaySummaryContainer(text) {
 		text: text
 	});
 }
+
 
 function buildSummaryContainer() {
 	const summaryContainer = document.createElement('div');
@@ -56,12 +58,12 @@ function buildSummaryContainer() {
 	const result = document.createElement('div');
 	result.id = 'result-text';
 	result.textContent = "";
-
+	
 	resultContainer.appendChild(result);
 
 	const footer = document.createElement('footer');
 	footer.id = 'footer';
-
+	
 	const retryBtn = document.createElement('button');
 	retryBtn.id = 'retry-btn';
 	retryBtn.textContent = 'Retry';
@@ -69,6 +71,13 @@ function buildSummaryContainer() {
 	const copyBtn = document.createElement('button');
 	copyBtn.id = 'copy-btn';
 	copyBtn.textContent = 'Copy';
+	copyBtn.addEventListener('click', function() {
+		console.log("wtf");
+		navigator.clipboard.writeText(result.textContent).then(function () {
+			console.log('async: copied!');
+		});
+		
+	});
 
 	footer.appendChild(retryBtn);
 	footer.appendChild(copyBtn);
