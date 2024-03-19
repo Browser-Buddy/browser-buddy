@@ -18,17 +18,63 @@ browser.runtime.onMessage.addListener((request) => {
 });
 
 function displaySummaryContainer(text) {
-  removeSummaryContainer();
-  const newSummaryContainer = buildSummaryContainer();
-  document.body.appendChild(newSummaryContainer);
-  sendMessageToExtension(text);
+  	reloadContainer();
+	
+	browser.storage.local.get('apiKey').then(function(result) {
+		if (result.apiKey) {
+			// load the summary container.
+			
+  			const newSummaryContainer = buildSummaryContainer();
+  			document.body.appendChild(newSummaryContainer);
+  			sendMessageToExtension(text);
+		} else {
+			// load prompt container.
+			const newPromptContainer = buildPromptContainer();
+			document.body.appendChild(newPromptContainer);
+			
+		}
+	});
+
 }
 
-function removeSummaryContainer() {
-  const summaryContainer = document.getElementById('bb-summary-container');
-  if (summaryContainer) {
-    summaryContainer.remove();
-  }
+function buildPromptContainer() {
+	const promptContainer = createElement('div', 'bb-prompt-container');
+	const header = createHeader();
+	const prompt = createPrompt();
+
+	promptContainer.append(header, prompt);
+	return promptContainer;
+}
+
+function createPrompt() {
+	const promptContainer = createElement('div', 'bb-prompt-field-container');
+  	const promptField = createElement('input', 'bb-prompt-field');
+	const promptBtn = createElement('button', 'bb-prompt-btn');
+
+	promptField.setAttribute('type', 'text');
+  	promptContainer.appendChild(promptField);
+  	
+  	promptBtn.textContent = 'Submit';
+
+  	promptBtn.addEventListener('click', () => {
+    	const apiKey = promptContainer.querySelector('#bb-prompt-field').value;
+    	browser.storage.local.set({"apiKey": apiKey});
+  	});
+
+	promptContainer.appendChild(promptBtn);
+	return promptContainer;
+}
+
+
+function reloadContainer() {
+  	const summaryContainer = document.getElementById('bb-summary-container');
+	const promptContainer = document.getElementById('bb-prompt-container');
+  	if (summaryContainer) {
+    	summaryContainer.remove();
+  	}
+	if (promptContainer) {
+		promptContainer.remove();
+	}
 }
 
 function sendMessageToExtension(text) {

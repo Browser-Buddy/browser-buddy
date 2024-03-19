@@ -5,7 +5,7 @@
  "description": "Summarize highlighted text using OpenAI API.",
  "permissions": [
     "storage",
-    "activeTab",
+		"activeTab",
     "contextMenus"
  ],
  "action": {

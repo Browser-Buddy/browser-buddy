@@ -36,7 +36,8 @@ const generate = async (prompt) => {
 	console.log(newPrompt);
 
 	let API_URL = "https://api.openai.com/v1/chat/completions"
-	let API_KEY = browser.storage.local.get('apiKey');
+	let API_KEY = await browser.storage.local.get('apiKey');
+	console.log(API_KEY);
 	let whatever = "api key :)"
     // UI stuff, also avoid someone spamming generate until a
     // response is completed.
@@ -53,7 +54,7 @@ const generate = async (prompt) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${whatever}`
+                Authorization: `Bearer ${API_KEY.apiKey}`
             },
 			// swag
             // The actual prompt being sent to OpenAI.:
