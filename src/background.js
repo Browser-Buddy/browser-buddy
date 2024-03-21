@@ -38,14 +38,6 @@ const generate = async (prompt) => {
 	let API_URL = "https://api.openai.com/v1/chat/completions"
 	let API_KEY = await browser.storage.local.get('apiKey');
 	console.log(API_KEY);
-	let whatever = "api key :)"
-    // UI stuff, also avoid someone spamming generate until a
-    // response is completed.
-    // generateBtn.disabled = true;
-
-    // stopBtn.disabled = false;
-	//
-	
 
 	browser.tabs.query({active: true}, function(tabs) {
 				chrome.tabs.sendMessage(tabs[0].id, {
@@ -53,10 +45,6 @@ const generate = async (prompt) => {
 					resultText: "Generating..."
 				})
 			});
-
-
-    //controller = new AbortController();
-    //const signal = controller.signal;
 
     // Perform the fetch
     try {
@@ -66,7 +54,6 @@ const generate = async (prompt) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${API_KEY.apiKey}`
             },
-			// swag
             // The actual prompt being sent to OpenAI.:
             body: JSON.stringify({
                 model: "gpt-4",
@@ -83,71 +70,7 @@ const generate = async (prompt) => {
 					resultText: data.choices[0].message.content
 				})
 			});
-
-		/*
-        // Live-inputs the incoming tokens
-        const reader = response.body.getReader();
-
-        // Decoder required because the info is sent as bytes.
-        const decoder = new TextDecoder("utf-8");
-
-		browser.tabs.query({active: true}, function(tabs) {
-			chrome.tabs.sendMessage(tabs[0].id, {
-				action: "setResultText",
-				resultText: resultText
-			});
-		});
-		console.log("set resultText to nothing");
-        while (true) {
-            const chunk = await reader.read();
-            const {done, value} = chunk;
-            if (done) {
-                break;
-            }
-            const decodedChunk = decoder.decode(value);
-
-            // Removing the irrelevant information
-            const lines = decodedChunk.split("\n");
-			console.log("DECODED & SPLIT LINES-------");
-			console.log(lines);
-            const parsedLines = lines
-                .map(line => {
-					console.log("DECODED & SPLIT LINES-------");
-					console.log(line);
-					line.replace(/^data: /, "").trim()
-				})
-                .filter(line => line !== "" && line !== "[DONE]")
-                .map(line => {
-                    console.log(line);
-                    return JSON.parse(line)
-                });
-
-            for (const line of parsedLines) {
-
-                // Dereferencing hell
-                const {choices} = line;
-                const {delta} = choices[0];
-                const {content} = delta;
-                if (content) {
-                    console.log(content);
-
-					browser.tabs.query({active: true}, function(tabs) {
-						chrome.tabs.sendMessage(tabs[0].id, {
-							action: "updateResultText",
-							resultText: content
-						});
-					});		
-                }
-            }
-        }
-		*/
     } catch (e) {
-        //if (signal.aborted) {
-		//	browser.runtime.sendMessage({
-		//		action: "setResultText",
-		//		resultText: "Aborted."
-		//	});
-        //} else {
 			console.log(e.message)
 			browser.tabs.query({active: true}, function(tabs) {
 				chrome.tabs.sendMessage(tabs[0].id, {
@@ -155,14 +78,5 @@ const generate = async (prompt) => {
 					resultText: "Failure."
 				})
 			});
-			//browser.runtime.sendMessage({
-			//	action: "setResultText",
-			//	resultText: "Failure."
-			//});
-		//}
-    } finally {
-        // stopBtn.disabled = true;
-        // generateBtn.disabled = false;
-        //controller = null;
     }
 }

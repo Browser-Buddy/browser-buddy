@@ -48,10 +48,13 @@ function buildPromptContainer() {
 
 function createPrompt() {
 	const promptContainer = createElement('div', 'bb-prompt-field-container');
+	const promptTag = createElement('header', 'bb-prompt-tag');
   	const promptField = createElement('input', 'bb-prompt-field');
 	const promptBtn = createElement('button', 'bb-prompt-btn');
 
+	promptTag.textContent = "Enter OpenAI API key: ";
 	promptField.setAttribute('type', 'text');
+	promptContainer.appendChild(promptTag);
   	promptContainer.appendChild(promptField);
   	
   	promptBtn.textContent = 'Submit';
