@@ -31,7 +31,7 @@ const generate = async (prompt) => {
         return;
     }
 
-	let newPrompt = "Bullet point this information into an easy to read list: " + prompt;
+	let newPrompt = "Make the following text significantly shorter: " + prompt;
 
 	console.log(newPrompt);
 
@@ -59,7 +59,7 @@ const generate = async (prompt) => {
 			// swag
             // The actual prompt being sent to OpenAI.:
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "gpt-4",
                 messages: [{
                     role: "user",
                     content: newPrompt
@@ -95,7 +95,10 @@ const generate = async (prompt) => {
             const parsedLines = lines
                 .map(line => line.replace(/^data: /, "").trim())
                 .filter(line => line !== "" && line !== "[DONE]")
-                .map(line => JSON.parse(line));
+                .map(line => {
+                    console.log(line);
+                    return JSON.parse(line)
+                });
 
             for (const line of parsedLines) {
 
