@@ -44,9 +44,19 @@ const generate = async (prompt) => {
     // generateBtn.disabled = true;
 
     // stopBtn.disabled = false;
+	//
+	
 
-    controller = new AbortController();
-    const signal = controller.signal;
+	browser.tabs.query({active: true}, function(tabs) {
+				chrome.tabs.sendMessage(tabs[0].id, {
+					action: "setResultText",
+					resultText: "Generating..."
+				})
+			});
+
+
+    //controller = new AbortController();
+    //const signal = controller.signal;
 
     // Perform the fetch
     try {
@@ -63,12 +73,18 @@ const generate = async (prompt) => {
                 messages: [{
                     role: "user",
                     content: newPrompt
-                }],
-                stream: true
+                }]
             }),
-            signal,
         });
+		const data = await response.json();
+		browser.tabs.query({active: true}, function(tabs) {
+				chrome.tabs.sendMessage(tabs[0].id, {
+					action: "setResultText",
+					resultText: data.choices[0].message.content
+				})
+			});
 
+		/*
         // Live-inputs the incoming tokens
         const reader = response.body.getReader();
 
@@ -92,8 +108,14 @@ const generate = async (prompt) => {
 
             // Removing the irrelevant information
             const lines = decodedChunk.split("\n");
+			console.log("DECODED & SPLIT LINES-------");
+			console.log(lines);
             const parsedLines = lines
-                .map(line => line.replace(/^data: /, "").trim())
+                .map(line => {
+					console.log("DECODED & SPLIT LINES-------");
+					console.log(line);
+					line.replace(/^data: /, "").trim()
+				})
                 .filter(line => line !== "" && line !== "[DONE]")
                 .map(line => {
                     console.log(line);
@@ -118,14 +140,14 @@ const generate = async (prompt) => {
                 }
             }
         }
-
+		*/
     } catch (e) {
-        if (signal.aborted) {
-			browser.runtime.sendMessage({
-				action: "setResultText",
-				resultText: "Aborted."
-			});
-        } else {
+        //if (signal.aborted) {
+		//	browser.runtime.sendMessage({
+		//		action: "setResultText",
+		//		resultText: "Aborted."
+		//	});
+        //} else {
 			console.log(e.message)
 			browser.tabs.query({active: true}, function(tabs) {
 				chrome.tabs.sendMessage(tabs[0].id, {
@@ -137,10 +159,10 @@ const generate = async (prompt) => {
 			//	action: "setResultText",
 			//	resultText: "Failure."
 			//});
-		}
+		//}
     } finally {
         // stopBtn.disabled = true;
         // generateBtn.disabled = false;
-        controller = null;
+        //controller = null;
     }
 }
