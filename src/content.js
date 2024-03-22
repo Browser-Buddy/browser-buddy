@@ -3,6 +3,7 @@ const API_URL = "https://api.openai.com/v1/chat/completions";
 browser.runtime.onMessage.addListener((request) => {
 	switch (request.action) {
 		case 'summarize':
+    		browser.storage.local.set({"cachedPrompt": request.selectedText});
 			displaySummaryContainer(request.selectedText);
 			break;
 		case 'setResultText':
@@ -141,6 +142,16 @@ function createFooter(resultContainer) {
   	const footer = createElement('footer', 'bb-footer');
   	const retryBtn = createElement('button', 'bb-retry-btn');
   	retryBtn.textContent = 'Retry';
+
+	retryBtn.addEventListener('click', async () => {
+		var prompt = resultContainer.querySelector('#bb-result-text').textContent;
+		console.log(prompt);
+		  browser.runtime.sendMessage({
+			action: "retry",
+			text: prompt
+		  });
+	});
+
   	const copyBtn = createElement('button', 'bb-copy-btn');
   	copyBtn.textContent = 'Copy';
 

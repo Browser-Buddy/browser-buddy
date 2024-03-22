@@ -19,11 +19,14 @@ browser.runtime.onMessage.addListener((request) => {
 	if(request.action === 'API') {
 		let prompt = request.text;
 		generate(prompt);
-	}	
+	}
+	if (request.action === 'retry') {
+		let prompt = request.text;
+		generate(prompt, true);
+	}
 });
 
-const generate = async (prompt) => {
-	var resultText = "";
+const generate = async (prompt, isRetry = false) => {
 
     // Don't waste network bandwidth.
     if (!prompt) {
@@ -31,7 +34,14 @@ const generate = async (prompt) => {
         return;
     }
 
-	let newPrompt = "Make the following text significantly shorter: " + prompt;
+	let newPrompt = "";
+
+	if (isRetry) {
+		newPrompt = "Make the following text significantly shorter, as short as you can go while still retaining all key information: " + prompt;
+	} else {
+		newPrompt = "Make the following text significantly shorter, at least half the length: " + prompt;
+	}
+
 
 	console.log(newPrompt);
 
