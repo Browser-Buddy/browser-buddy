@@ -48,6 +48,10 @@
   padding: 16px;
   position: relative;
   background-color: var(--primary-color);
+	border-radius: var(--border-radius);
+	box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+	margin-left: 1rem;
+	margin-right: 1rem;
 }
 
 #bb-result {
@@ -78,6 +82,7 @@
   border-bottom-right-radius: var(--border-radius);
 }
 
+#bb-exit-btn,
 #bb-retry-btn,
 #bb-copy-btn {
   background-color: var(--accent-color);

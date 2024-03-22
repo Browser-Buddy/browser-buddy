@@ -112,6 +112,18 @@ function createHeader() {
 	const exitBtn = createElement('button', 'bb-exit-btn');
   	exitBtn.textContent = 'X';
 
+	exitBtn.addEventListener('click', () => {
+		const prompt = document.getElementById('bb-prompt-container');
+		const summary = document.getElementById('bb-summary-container');
+		if (prompt) {
+			prompt.remove();
+		} 
+		if (summary) {
+			summary.remove();
+		}
+	});
+
+
   	header.append(heading, exitBtn);
   	return header;
 }
